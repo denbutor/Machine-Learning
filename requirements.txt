@@ -2,3 +2,14 @@ pandas==2.2.0
 scikit-learn==1.4.0
 pyyaml==6.0.1
 numpy==1.26.3
+featuretools
+mlxtend
+librosa
+scikit-image
+statsmodels
+featuretools
+mlxtend
+librosa
+scikit-image
+statsmodels
+setuptools

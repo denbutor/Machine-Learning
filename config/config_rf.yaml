@@ -1,9 +1,10 @@
 model_family: partitioning
 features:
-  numeric_continuous: [DataUsage, DayMins, DayCalls, MonthlyCharge, OverageFee, RoamMins]
-  categorical_nominal: [DataPlan]
-  categorical_ordinal: [ContractRenewal, CustServCalls]
-protected_attributes: [AccountWeeks]
+  numeric_continuous: [Tenure, WarehouseToHome, HourSpendOnApp, NumberOfDeviceRegistered, NumberOfAddress, OrderAmountHikeFromlastYear, CouponUsed, OrderCount, DaySinceLastOrder, CashbackAmount]
+  numeric_binary: [Complain]
+  categorical_nominal: [PreferredPaymentMode, PreferedOrderCat, PreferredLoginDevice, MaritalStatus]
+  categorical_ordinal: [SatisfactionScore]
+protected_attributes: [CityTier, Gender]
 imputation_policy:
   numeric:
     - {max_share: 0.10, strategy: median}
@@ -15,9 +16,11 @@ imputation_policy:
 transform_policy:
   additive:
     numeric_continuous: [log1p, standard_scaler]
-    categorical_nominal: [one_hot]
+    numeric_binary: [standard_scaler]
+    categorical_nominal: [aliases, one_hot]
     categorical_ordinal: [ordinal_encoder, standard_scaler]
   partitioning:
     numeric_continuous: [winsorize]
-    categorical_nominal: [one_hot]
+    numeric_binary: [passthrough]
+    categorical_nominal: [aliases, one_hot]
     categorical_ordinal: [ordinal_encoder]

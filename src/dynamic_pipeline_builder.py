@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder, FunctionTransformer
 
 
+
 def validate_config(config: Dict[str, Any]) -> None:
     """Блокує потрапляння protected_attributes до features."""
     protected = set(config.get("protected_attributes", []))
@@ -89,6 +90,34 @@ class AdaptiveImputer(BaseEstimator, TransformerMixin):
             transformed_parts.append(imp.transform(col_data))
         return np.hstack(transformed_parts)
 
+# class ValueAliasMapper(BaseEstimator, TransformerMixin):
+#     """Зводить синоніми категорій до єдиного стандарту (EDA знахідка)."""
+#     def __init__(self):
+#         self.mapping = {
+#             'Phone': 'Mobile Phone',
+#             'Mobile': 'Mobile Phone',
+#             'CC': 'Credit Card',
+#             'COD': 'Cash on Delivery'
+#         }
+#     def fit(self, X, y=None):
+#         return self
+#     def transform(self, X):
+#         X_df = pd.DataFrame(X)
+#         return X_df.replace(self.mapping).values
+
+class ValueAliasMapper(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.mapping = {
+            'Phone': 'Mobile Phone',
+            'Mobile': 'Mobile Phone',
+            'CC': 'Credit Card',
+            'COD': 'Cash on Delivery'
+        }
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        X_df = pd.DataFrame(X)
+        return X_df.replace(self.mapping).values
 
 def get_transformer(name: str):
     if name == 'log1p':
@@ -101,7 +130,24 @@ def get_transformer(name: str):
         return OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
     if name == 'winsorize':
         return Winsorizer(lower_quantile=0.05, upper_quantile=0.95)
+    if name == 'aliases':
+        return ValueAliasMapper()
+    if name == 'passthrough':
+        return FunctionTransformer(lambda x: x)
     return 'passthrough'
+
+# def get_transformer(name: str):
+#     if name == 'log1p':
+#         return FunctionTransformer(np.log1p)
+#     if name == 'standard_scaler':
+#         return StandardScaler()
+#     if name == 'one_hot':
+#         return OneHotEncoder(handle_unknown='ignore', sparse_output=False)
+#     if name == 'ordinal_encoder':
+#         return OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+#     if name == 'winsorize':
+#         return Winsorizer(lower_quantile=0.05, upper_quantile=0.95)
+#     return 'passthrough'
 
 
 class DynamicPipelineBuilder:
